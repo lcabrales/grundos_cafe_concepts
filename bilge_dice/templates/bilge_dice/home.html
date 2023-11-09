@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+    <h1>Bilge Dice</h1>
+    <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
+    <p>
+        <form>
+            {% for roll in rolls %}
+                <input type="checkbox">{{ roll }}</input>
+            {% endfor %}
+            <input type="submit" value="Keep"/>
+        </form>
+        <p>Your hand</p>
+        <p>Current Score: 0</p>
+        <p>{{ player.hand }}</p>
+        <p>Qualifiers:</p>
+        <p>{{ player.qualifiers }}</p>
+
+        <p>Opponents:</p>
+        {% for opponent in opponents %}
+            {% if opponent.player.image %}
+                <img src="{{ opponent.player.image.url }}">
+            {% endif %}
+            <p>{{ opponent.hand }}</p>
+            <p>Qualifiers:</p>
+            <p>{{ opponent.qualifiers }}</p>
+            <p>{{ opponent.player.name }}'s Score: 0</p>
+        {% endfor %}
+    </p>
+{% endblock page_content %}
