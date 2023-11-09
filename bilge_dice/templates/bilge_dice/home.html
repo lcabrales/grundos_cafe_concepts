@@ -1,30 +1,115 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block page_content %}
+    <link rel="stylesheet" href="{% static 'bilge_dice/css/styles.css' %}">
+
     <h1>Bilge Dice</h1>
     <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
-    <p>
-        <form>
-            {% for roll in rolls %}
-                <input type="checkbox">{{ roll }}</input>
+    <div class="row game-board">
+        <div class="col-8">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    <img src="{% static 'bilge_dice/images/yourrolls.gif' %}" alt="Your Rolls">
+                </div>
+            </div>
+            <form>
+                <div class="row mt-1">
+                    <div class="col-12 d-flex justify-content-center">
+                        {% for dice_roll in dice_rolls %}
+                            <div class="px-1">
+                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                <br>
+                                <label for="checkbox" class="text-checkbox">{{ dice_roll.number }}</label>
+                                <br>
+                                <input type="checkbox"/>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 d-flex justify-content-center">
+                        <input class="btn-keep" type="submit" value="Keep"/>
+                    </div>
+                </div>
+            </form>
+            <div class="row mt-2">
+                <div class="col-12 d-flex justify-content-center">
+                    <span class="text-center text-standard px-4">You must select at least one die to keep before you can re-roll</span>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <img src="{% static 'bilge_dice/images/yourhand.gif' %}" alt="Your Hand">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <span class="text-standard fw-bold">Current Score: {{ player.score }}</span>
+                       </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12 d-flex justify-content-center">
+                            {% for dice_roll in player.hand %}
+                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                            {% endfor %}
+                       </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <span class="text-standard fw-bold">Qualifiers</span>
+                       </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            {% for dice_roll in player.qualifiers %}
+                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                            {% endfor %}
+                       </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div class="col-4">
+            <img src="{% static 'bilge_dice/images/opponents.gif' %}" alt="Opponents">
+            {% for opponent in opponents %}
+                <div class="row mt-1">
+                    <div class="col-5">
+                        {% if opponent.player.image %}
+                            <img class="opponent-image mr-2" src="{{ opponent.player.image.url }}">
+                        {% endif %}
+                    </div>
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-center">
+                                {% for dice_roll in player.hand %}
+                                    <img class="opponent-dice-roll" src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-center">
+                                <span class="text-standard-small fw-bold">Qualifiers</span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 d-flex justify-content-center">               
+                                {% for dice_roll in player.qualifiers %}
+                                    <img class="opponent-dice-roll mx-1" src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <span class="text-standard fw-bold">{{ opponent.player.name }}'s Score: {{ opponent.score }}</span>
+                    </div>
+                </div>
             {% endfor %}
-            <input type="submit" value="Keep"/>
-        </form>
-        <p>Your hand</p>
-        <p>Current Score: 0</p>
-        <p>{{ player.hand }}</p>
-        <p>Qualifiers:</p>
-        <p>{{ player.qualifiers }}</p>
-
-        <p>Opponents:</p>
-        {% for opponent in opponents %}
-            {% if opponent.player.image %}
-                <img src="{{ opponent.player.image.url }}">
-            {% endif %}
-            <p>{{ opponent.hand }}</p>
-            <p>Qualifiers:</p>
-            <p>{{ opponent.qualifiers }}</p>
-            <p>{{ opponent.player.name }}'s Score: 0</p>
-        {% endfor %}
-    </p>
+        </div>
+    </div>
 {% endblock page_content %}

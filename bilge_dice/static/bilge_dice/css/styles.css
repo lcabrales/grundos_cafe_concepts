@@ -1,0 +1,38 @@
+.game-board {
+    background-image: url("/static/bilge_dice/images/background.gif");
+    width: 540px;
+    height: 400px;
+    padding: 8px;
+}
+
+.text-standard {
+    font-size: 14px;
+    color: white;
+}
+
+.text-standard-small {
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.text-checkbox {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    padding: 4px;
+}
+
+.btn-keep {
+    font-size: 12px;
+}
+
+.opponent-image {
+    height: 64px;
+    width: 64px;;
+}
+
+.opponent-dice-roll {
+    height: 22px;
+    width: 22px;;
+}

@@ -11,6 +11,6 @@ def home(request):
         "user": user,
         "player": user_player,
         "opponents": opponents,
-        "rolls": dice_rolls
+        "dice_rolls": dice_rolls
     }
     return render(request, "bilge_dice/home.html", context)
