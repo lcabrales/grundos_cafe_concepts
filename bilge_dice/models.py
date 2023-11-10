@@ -18,3 +18,5 @@ class PlayerState(models.Model):
     player = models.ForeignKey(Player, null=True, on_delete=models.CASCADE)
     hand = models.CharField(max_length=4, blank=True)
     qualifiers = models.CharField(max_length=2, blank=True)
+    is_game_over = models.BooleanField(default=False)
+    rolls_left = models.IntegerField(default=6)

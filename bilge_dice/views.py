@@ -16,9 +16,9 @@ def home(request):
     else:
         dice_rolls = bilgedice.get_rolls()
 
-    if not dice_rolls:
+    results = None
+    if not bilgedice.validate_game_state(dice_rolls):
         results = bilgedice.get_final_results()
-        return render_results(request, results)
 
     user = bilgedice.get_user()
     user_player = bilgedice.get_user_player()
@@ -28,21 +28,11 @@ def home(request):
         "user": user,
         "player": user_player,
         "opponents": opponents,
-        "dice_rolls": dice_rolls
-    }
-
-    return render(request, "bilge_dice/home.html", context)
-
-
-def render_results(request, results):
-    user = bilgedice.get_user()
-
-    context = {
-        "user": user,
+        "dice_rolls": dice_rolls,
         "results": results
     }
 
-    return render(request, "bilge_dice/results.html", context)
+    return render(request, "bilge_dice/home.html", context)
 
 
 def check_new_game(request):
