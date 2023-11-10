@@ -13,16 +13,17 @@
                     <img src="{% static 'bilge_dice/images/yourrolls.gif' %}" alt="Your Rolls">
                 </div>
             </div>
-            <form>
+            <form action="" method="post">
+                {% csrf_token %}
                 <div class="row mt-1">
                     <div class="col-12 d-flex justify-content-center">
                         {% for dice_roll in dice_rolls %}
                             <div class="px-1">
-                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                <img src="{{ dice_roll.image_url }}"" alt="{{ dice_roll.number }}"">
                                 <br>
                                 <label for="checkbox" class="text-checkbox">{{ dice_roll.number }}</label>
                                 <br>
-                                <input type="checkbox"/>
+                                <input type="checkbox" name="roll_{{ forloop.counter0 }}" value="{{ dice_roll.number }}"/>
                             </div>
                         {% endfor %}
                     </div>
@@ -53,7 +54,7 @@
                     <div class="row mt-2">
                         <div class="col-12 d-flex justify-content-center">
                             {% for dice_roll in player.hand %}
-                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                             {% endfor %}
                        </div>
                     </div>
@@ -65,7 +66,7 @@
                     <div class="row">
                         <div class="col-12 d-flex justify-content-center">
                             {% for dice_roll in player.qualifiers %}
-                                <img src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                             {% endfor %}
                        </div>
                     </div>
@@ -86,7 +87,7 @@
                         <div class="row">
                             <div class="col-12 d-flex justify-content-center">
                                 {% for dice_roll in player.hand %}
-                                    <img class="opponent-dice-roll" src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                    <img class="opponent-dice-roll" src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                                 {% endfor %}
                             </div>
                         </div>
@@ -98,7 +99,7 @@
                         <div class="row">
                             <div class="col-12 d-flex justify-content-center">               
                                 {% for dice_roll in player.qualifiers %}
-                                    <img class="opponent-dice-roll mx-1" src={{ dice_roll.image_url }} alt={{ dice_roll.number }}>
+                                    <img class="opponent-dice-roll mx-1" src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                                 {% endfor %}
                             </div>
                         </div>

@@ -6,6 +6,7 @@ class User(models.Model):
 
 class Game(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    rolls = models.CharField(max_length=6, blank=True)
 
 class Player(models.Model):
     name = models.CharField(max_length=20)

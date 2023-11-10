@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_content %}
+    <link rel="stylesheet" href="{% static 'bilge_dice/css/styles.css' %}">
+
+    <h1>Bilge Dice</h1>
+    <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
+    <div class="row game-board">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
+                    <p class="text-standard fw-bold mx-auto text-center">
+                        {% if results.is_victory %}
+                            You won!
+
+                            <p class="text-standard fw-bold mx-auto text-center">
+                                Total score: {{ results.user_score }}
+                            </p>
+                        {% else %}
+                            You lost.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    <form action="" method="post">  
+                        {% csrf_token %}
+                        <input type="hidden" name="new_game" value="1"/>
+                        <input class="btn-keep" type="submit" value="Start over"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page_content %}
