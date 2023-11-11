@@ -153,14 +153,37 @@ def keep_opponents_hand(amount_to_keep):
     opponent_players = get_opponents_db()
 
     for opponent in opponent_players:
+        player_amount_to_keep = amount_to_keep
+
         player_state = get_player_state(opponent)
 
         if player_state.is_game_over or player_state.rolls_left <= 0:
             continue
 
-        roll_results = roll_dice(amount_to_keep)
-        rolls = numbers_list_to_string(roll_results)
-        keep_player_hand(opponent, rolls)
+        qualifiers = string_to_numbers_list(player_state.qualifiers)
+        need_first_qualifier = FIRST_QUALIFIER not in qualifiers
+        need_second_qualifier = SECOND_QUALIFIER not in qualifiers
+
+        roll_results = roll_dice(player_state.rolls_left)
+
+        rolls_to_keep = []
+        if need_first_qualifier and FIRST_QUALIFIER in roll_results and player_amount_to_keep > 0:
+            rolls_to_keep.append(FIRST_QUALIFIER)
+            roll_results.remove(FIRST_QUALIFIER)
+            player_amount_to_keep -= 1
+
+        if need_second_qualifier and SECOND_QUALIFIER in roll_results and player_amount_to_keep > 0:
+            rolls_to_keep.append(SECOND_QUALIFIER)
+            roll_results.remove(SECOND_QUALIFIER)
+            player_amount_to_keep -= 1
+
+        if player_amount_to_keep > 0:
+            sorted_rolls = sorted(roll_results, reverse=True)
+            highest_rolls = sorted_rolls[:player_amount_to_keep]
+            for roll in highest_rolls:
+                rolls_to_keep.append(roll)
+
+        keep_player_hand(opponent, numbers_list_to_string(rolls_to_keep))
 
 
 def update_player_state(player, numbers):
