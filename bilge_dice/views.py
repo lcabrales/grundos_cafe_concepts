@@ -1,14 +1,41 @@
 from django.shortcuts import render
-from bilge_dice.models import User
 from bilge_dice import bilgedice
 
+
 def home(request):
-    is_new_game = check_new_game(request)
+    bet = request.POST.get("bet")
+    is_start_over = check_start_over(request)
+    is_show_results = check_show_results(request)
 
-    if is_new_game:
-        bilgedice.new_game()
+    if is_start_over:
+        # start over after results view
+        bilgedice.delete_current_game()
+        return render_welcome(request)
 
-    if request.method == "POST" and not is_new_game:
+    if bet:
+        # selected a bet from welcome view
+        bilgedice.new_game(bet)
+        return render_game(request)
+
+    if not bilgedice.get_current_game():
+        # error?
+        return render_welcome(request)
+    
+    if is_show_results:
+        return render_results(request)
+
+    return render_game(request)
+
+
+def render_welcome(request):
+    user = bilgedice.get_user()
+    context = {
+        "user": user,
+    }
+    return render(request, "bilge_dice/welcome.html", context)
+
+def render_game(request):
+    if request.method == "POST":
         if check_selection(request):
             dice_rolls = bilgedice.generate_rolls()
         else:
@@ -16,9 +43,9 @@ def home(request):
     else:
         dice_rolls = bilgedice.get_rolls()
 
-    results = None
-    if not bilgedice.validate_game_state(dice_rolls):
-        results = bilgedice.get_final_results()
+    game_state = bilgedice.validate_game_state()
+    if game_state == bilgedice.GameState.RESULTS:
+        return render_final_user_score(request)
 
     user = bilgedice.get_user()
     user_player = bilgedice.get_user_player()
@@ -28,15 +55,46 @@ def home(request):
         "user": user,
         "player": user_player,
         "opponents": opponents,
-        "dice_rolls": dice_rolls,
+        "dice_rolls": dice_rolls
+    }
+
+    return render(request, "bilge_dice/game.html", context)
+
+
+def render_final_user_score(request):
+    user = bilgedice.get_user()
+    user_player = bilgedice.get_user_player()
+    results = bilgedice.get_final_results()
+
+    context = {
+        "user": user,
+        "player": user_player,
         "results": results
     }
 
-    return render(request, "bilge_dice/home.html", context)
+    return render(request, "bilge_dice/your_score.html", context)
 
 
-def check_new_game(request):
+def render_results(request):
+    user = bilgedice.get_user()
+    user_player = bilgedice.get_user_player()
+    results = bilgedice.get_final_results()
+
+    context = {
+        "user": user,
+        "player": user_player,
+        "results": results
+    }
+
+    return render(request, "bilge_dice/results.html", context)
+
+
+def check_start_over(request):
     return request.POST.get("new_game")
+
+
+def check_show_results(request):
+    return request.POST.get("show_results")
 
 
 def check_selection(request):

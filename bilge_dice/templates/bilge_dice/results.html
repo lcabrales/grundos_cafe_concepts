@@ -7,30 +7,54 @@
     <h1>Bilge Dice</h1>
     <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
     <div class="row game-board">
-        <div class="col-12">
+        <div class="col-7">
             <div class="row">
-                <div class="col-12">
-                    <p class="text-standard fw-bold mx-auto text-center">
-                        {% if results.is_victory %}
-                            You won!
-
-                            <p class="text-standard fw-bold mx-auto text-center">
-                                Total score: {{ results.user_score }}
-                            </p>
-                        {% else %}
-                            You lost.
-                        {% endif %}
-                    </p>
+                <div class="col text-center">
+                    {% for opponent_result in results.opponents_results %}
+                        <div class="row mt-1">
+                            <div class="col-5 text-center">
+                                {% if opponent_result.image %}
+                                    <img class="mr-2" src="{{ opponent_result.image.url }}" alt="{{opponent_result.name}}">
+                                {% endif %}
+                                <span class="d-block text-standard fw-bold text-center">{{ opponent_result.name }}</span>
+                            </div>
+                            <div class="col-7 d-flex align-items-center">
+                                <span class="text-standard-big fw-bold">
+                                    {% if opponent_result.is_qualified %}
+                                        Scored a {{ opponent_result.score }}!
+                                    {% else %}
+                                        Did not qualify!
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
+        </div>
+        <div class="col-5">
             <div class="row">
-                <div class="col-12 d-flex justify-content-center">
-                    <form action="" method="post">  
-                        {% csrf_token %}
-                        <input type="hidden" name="new_game" value="1"/>
-                        <input class="btn-keep" type="submit" value="Start over"/>
-                    </form>
+                <div class="col">
+                    {% if results.game_result.value == 1 %}
+                        <p class="text-standard fw-bold">You won!</p>
+                        <p class="text-standard fw-bold">Your score of {{ results.user_score }} was enough to win!</p>
+                        <p class="text-standard fw-bold">You won x NPs!</p>
+                    {% elif results.game_result.value == 0 %}
+                        <p class="text-standard fw-bold">You tied.</p>
+                        <p class="text-standard fw-bold">You won x NPs!</p>
+                    {% else %}
+                        <p class="text-standard fw-bold">Oh no!</p>
+                        <p class="text-standard fw-bold">Your score of {{ results.user_score }} was not enough to win!</p>
+                        <p class="text-standard fw-bold">Better luck next time!</p>
+                    {% endif %}
+                    
                 </div>
+                <form action="" method="post">  
+                    {% csrf_token %}
+                    <input type="hidden" name="new_game" value="1"/>
+                    <input class="btn-standard" type="submit" value="Play Again!"/>
+                </form>
+                <img  class="mt-2" src="{% static 'bilge_dice/images/lose.gif' %}">
             </div>
         </div>
     </div>

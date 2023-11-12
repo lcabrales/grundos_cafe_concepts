@@ -6,19 +6,19 @@
 
     <h1>Bilge Dice</h1>
     <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
-    <div class="row game-board">
+    <div class="row game-board d-flex justify-content-center">
         <div class="col-8">
             {% if not results %}
             <div id="player_game">
                 <div class="row">
-                    <div class="col-12 d-flex justify-content-center">
+                    <div class="col d-flex justify-content-center">
                         <img src="{% static 'bilge_dice/images/yourrolls.gif' %}" alt="Your Rolls">
                     </div>
                 </div>
                 <form action="" method="post">
                     {% csrf_token %}
                     <div class="row mt-1">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             {% for dice_roll in dice_rolls %}
                                 <div class="px-1 text-center">
                                     <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
@@ -29,13 +29,13 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
-                            <input class="btn-keep" type="submit" value="Keep"/>
+                        <div class="col d-flex justify-content-center">
+                            <input class="btn-standard" type="submit" value="Keep"/>
                         </div>
                     </div>
                 </form>
                 <div class="row mt-2">
-                    <div class="col-12 d-flex justify-content-center">
+                    <div class="col d-flex justify-content-center">
                         <span class="text-center text-standard px-4">You must select at least one die to keep before you can re-roll</span>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
             {% else %}
             <div id="results" class="pb-5">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col">
                         <p class="text-standard fw-bold mx-auto text-center">
                             {% if results.game_result == 1 %}
                                 You won!
@@ -62,11 +62,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 d-flex justify-content-center">
+                    <div class="col d-flex justify-content-center">
                         <form action="" method="post">  
                             {% csrf_token %}
                             <input type="hidden" name="new_game" value="1"/>
-                            <input class="btn-keep" type="submit" value="Start over"/>
+                            <input class="btn-standard" type="submit" value="Start over"/>
                         </form>
                     </div>
                 </div>
@@ -74,31 +74,31 @@
             {% endif %}
 
             <div class="row mt-4">
-                <div class="col-12">
+                <div class="col">
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             <img src="{% static 'bilge_dice/images/yourhand.gif' %}" alt="Your Hand">
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             <span class="text-standard fw-bold">Current Score: {{ player.score }}</span>
                     </div>
                     </div>
                     <div class="row mt-2">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             {% for dice_roll in player.hand %}
                                 <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                             {% endfor %}
                     </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             <span class="text-standard fw-bold">Qualifiers</span>
                     </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 d-flex justify-content-center">
+                        <div class="col d-flex justify-content-center">
                             {% for dice_roll in player.qualifiers %}
                                 <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                             {% endfor %}
@@ -118,19 +118,19 @@
                     </div>
                     <div class="col-7">
                         <div class="row">
-                            <div class="col-12 d-flex justify-content-center">
+                            <div class="col d-flex justify-content-center">
                                 {% for dice_roll in opponent.hand %}
                                     <img class="opponent-dice-roll" src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                                 {% endfor %}
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12 d-flex justify-content-center">
+                            <div class="col d-flex justify-content-center">
                                 <span class="text-standard-small fw-bold">Qualifiers</span>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12 d-flex justify-content-center">               
+                            <div class="col d-flex justify-content-center">               
                                 {% for dice_roll in opponent.qualifiers %}
                                     <img class="opponent-dice-roll mx-1" src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
                                 {% endfor %}
@@ -139,7 +139,7 @@
                     </div>
                 </div>
                 <div class="row mb-4 pb-1">
-                    <div class="col-12">
+                    <div class="col">
                         <span class="text-standard fw-bold">{{ opponent.player.name }}'s Score: {{ opponent.score }}</span>
                     </div>
                 </div>

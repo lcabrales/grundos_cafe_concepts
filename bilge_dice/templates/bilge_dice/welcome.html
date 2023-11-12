@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_content %}
+    <link rel="stylesheet" href="{% static 'bilge_dice/css/styles.css' %}">
+
+    <h1>Bilge Dice</h1>
+    <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</span>
+    <div class="row">
+        <div class="col text-center">
+            <span class="d-block fw-bold">Welcome to Bilge Dice!</p>
+            <img class="dealer" src="{% static 'bilge_dice/images/dealer.gif' %}" alt="Dealer">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <span class="d-block fw-bold mt-1">Choose you ante amount:</span>
+            <form class="mt-1" action="" method="post">  
+                {% csrf_token %}
+                <input class="btn-standard ms-2" name="bet" type="submit" value="10 NP"/>
+                <input class="btn-standard me-2" name="bet" type="submit" value="50 NP"/>
+            </form>
+        </div>
+    </div>
+{% endblock page_content %}

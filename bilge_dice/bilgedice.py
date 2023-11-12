@@ -1,5 +1,6 @@
 import random
 from bilge_dice.models import User, Game, Player, PlayerState
+from enum import Enum
 
 TOTAL_DICE_COUNT = 6
 HAND_SIZE = 4
@@ -13,13 +14,26 @@ def get_user():
 
 def get_current_game():
     user = get_user()
-    current_game, created = Game.objects.get_or_create(user_id=user.id)
+    current_game = Game.objects.filter(user_id=user.id).first()
     return current_game
 
 
-def new_game():
+def delete_current_game():
     game = get_current_game()
-    game.delete()
+    if game:
+        game.delete()
+
+
+def new_game(bet_string):
+    delete_current_game()
+
+    user = get_user()
+    new_game = Game(user_id=user.id, bet=get_bet_value(bet_string))
+    new_game.save()
+
+
+def get_bet_value(bet_string):
+    return int(bet_string.split()[0])
 
 
 def get_user_player_db():
@@ -157,7 +171,7 @@ def keep_opponents_hand(amount_to_keep):
 
         player_state = get_player_state(opponent)
 
-        if player_state.is_game_over or player_state.rolls_left <= 0:
+        if is_player_game_over(opponent):
             continue
 
         qualifiers = string_to_numbers_list(player_state.qualifiers)
@@ -224,14 +238,22 @@ def get_final_results():
     opponent_players = get_opponents_db()
 
     scores_to_beat = []
+    opponents_results = []
     for opponent in opponent_players:
         player_state = get_player_state(opponent)
         is_qualified = is_player_qualified(opponent)
 
-        if not is_qualified:
-            continue
+        opponent_score = calculate_score(player_state)
 
-        scores_to_beat.append(calculate_score(player_state))
+        if is_qualified:
+            scores_to_beat.append(opponent_score)
+
+        opponent_image = opponent.image
+        if opponent_score <= user_score:
+            opponent_image = opponent.image_sad
+
+        opponent_result = OpponentResult(opponent.name, opponent_score, is_qualified, opponent_image)
+        opponents_results.append(opponent_result)
 
     opponent_highest_score = 0
     if scores_to_beat:
@@ -239,18 +261,23 @@ def get_final_results():
     
     game_result = 0
     if not is_player_qualified(user_player):
-        game_result = -2
+        game_result = GameResult.DID_N0T_QUALIFY
     elif user_score > opponent_highest_score:
-        game_result = 1
+        game_result = GameResult.WON
     elif user_score == opponent_highest_score:
-        game_result = 0
+        game_result = GameResult.TIED
     else:
-        game_result = -1
+        game_result = GameResult.LOST
 
     print(f"final score: {user_score}")
+    print(f"opponents_results: {opponents_results}")
 
-    return FinalResults(user_score, game_result)
+    return FinalResults(user_score, game_result, opponents_results)
 
+
+def is_player_game_over(player):
+    player_state = get_player_state(player)
+    return player_state.is_game_over or player_state.rolls_left <= 0
 
 def is_player_qualified(player):
     player_state = get_player_state(player)
@@ -259,11 +286,18 @@ def is_player_qualified(player):
     return FIRST_QUALIFIER in qualifiers and SECOND_QUALIFIER in qualifiers
 
 
-def validate_game_state(dice_rolls):
-    player = get_user_player_db()
-    player_state = get_player_state(player)
+def validate_game_state():
+    game = get_current_game()
+
+    if not game:
+        return GameState.WELCOME
     
-    return dice_rolls and not player_state.is_game_over
+    player = get_user_player_db()
+
+    if is_player_game_over(player):
+        return GameState.RESULTS
+
+    return GameState.GAME
     
 
 def string_to_numbers_list(string):
@@ -327,7 +361,30 @@ class PlayerUi:
     self.score = score
 
 
+class OpponentResult:
+    def __init__(self, name, score, is_qualified, image):
+        self.name = name
+        self.score = score
+        self.is_qualified = is_qualified
+        self.image = image
+
+
 class FinalResults:
-  def __init__(self, user_score, game_result):
+  def __init__(self, user_score, game_result, opponents_results):
     self.user_score = user_score
     self.game_result = game_result
+    self.opponents_results = opponents_results
+
+
+class GameState(Enum):
+    WELCOME = 0
+    GAME = 1
+    RESULTS = 2
+
+
+class GameResult(Enum):
+    DID_N0T_QUALIFY = -2
+    LOST = -1
+    TIED = 0
+    WON = 1
+

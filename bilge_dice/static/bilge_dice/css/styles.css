@@ -5,6 +5,11 @@
     padding: 8px;
 }
 
+.dealer {
+    width: 200px;
+    height: 200px;
+}
+
 .text-standard {
     font-size: 14px;
     color: white;
@@ -16,13 +21,18 @@
     color: white;
 }
 
+.text-standard-big {
+    font-size: 18px;
+    color: white;
+}
+
 .text-checkbox {
     font-size: 16px;
     font-weight: bold;
     color: white;
 }
 
-.btn-keep {
+.btn-standard {
     font-size: 12px;
 }
 

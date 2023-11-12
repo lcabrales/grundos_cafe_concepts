@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_content %}
+    <link rel="stylesheet" href="{% static 'bilge_dice/css/styles.css' %}">
+
+    <h1>Bilge Dice</h1>
+    <p>Welcome, {{ user.username }} | NP: {{ user.nps }}</p>
+    <div class="row game-board">
+        <div class="col">
+            <div class="row">
+                <div class="col">
+                    <p class="text-standard fw-bold mx-auto text-center">
+                        {% if results.game_result.value == -2 %}
+                            You lose! You did not qualify!
+                        {% else %}
+                            You have managed a score of {{ player.score }}!!
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <img src="{% static 'bilge_dice/images/yourhand.gif' %}" alt="Your Hand">
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12 d-flex justify-content-center">
+                            {% for dice_roll in player.hand %}
+                                <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            <span class="text-standard fw-bold">Qualifiers</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-center">
+                            {% for dice_roll in player.qualifiers %}
+                                <img src="{{ dice_roll.image_url }}" alt="{{ dice_roll.number }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col d-flex justify-content-center">
+                    <form action="" method="post">  
+                        {% csrf_token %}
+                        {% if results.game_result.value == -2 %}
+                            <input type="hidden" name="new_game" value="1"/>
+                            <input class="btn-standard px-5" type="submit" value="Play again!"/>
+                        {% else %}
+                            <input type="hidden" name="show_results" value="1"/>
+                            <input class="btn-standard px-5" type="submit" value="See if you defeated those scallywags!!"/>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col text-center">
+                    <img src="{% static 'bilge_dice/images/gembanner.gif' %}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page_content %}
