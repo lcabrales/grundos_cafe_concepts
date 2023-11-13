@@ -88,9 +88,9 @@ def render_final_user_score(request):
 
 
 def render_results(request):
+    results = bilgedice.get_final_results(True)
     user = bilgedice.get_user()
     user_player = bilgedice.get_user_player()
-    results = bilgedice.get_final_results(True)
 
     bilgedice.delete_current_game()
 

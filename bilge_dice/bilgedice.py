@@ -372,7 +372,7 @@ def validate_game_state():
         return GameState.RESULTS
 
     return GameState.GAME
-    
+
 
 def string_to_numbers_list(string):
     return [int(number) for number in string]
