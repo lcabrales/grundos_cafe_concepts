@@ -1,5 +1,5 @@
 import random
-from bilge_dice.models import User, Game, Player, PlayerState, UserBilgeDice
+from bilge_dice.models import User, Session, Game, Player, PlayerState, UserBilgeDice
 from enum import Enum
 
 TOTAL_DICE_COUNT = 6
@@ -15,8 +15,27 @@ NPS_WIN_MULTIPLIER = 4
 RNG_AVATAR_SCORE = 24
 WIN_STREAK_AVATAR_COUNT = 10
 
+
+def get_user_session():
+    return Session.objects.first()
+
+
+def create_user_session(username):
+    Session.objects.all().delete()
+
+    user, created = User.objects.get_or_create(username=username)
+    session = Session(user_id=user.id)
+    session.save()
+
+
 def get_user():
-    return User.objects.first()
+    session = get_user_session()
+
+    user = User.objects.first()
+    if session:
+        user = session.user
+
+    return user
 
 
 def get_current_game():
@@ -34,9 +53,13 @@ def delete_current_game():
 def new_game(bet_string):
     delete_current_game()
 
+    bet = get_bet_value(bet_string)
+
     user = get_user()
-    new_game = Game(user_id=user.id, bet=get_bet_value(bet_string))
+    new_game = Game(user_id=user.id, bet=bet)
     new_game.save()
+
+    update_user_nps(-bet)
 
 
 def get_bet_value(bet_string):
@@ -295,7 +318,7 @@ def get_final_results(is_final_result):
     if is_final_result:
         updateWinStreak(game_result == GameResult.WON)
         if nps_won > 0:
-            credit_user_nps(nps_won)
+            update_user_nps(nps_won)
         checkAvatarsConditions(results)
 
     return results
@@ -398,7 +421,10 @@ def get_empty_dice_roll_image():
     return "/static/bilge_dice/images/d0.gif"
 
 
-def credit_user_nps(nps):
+def update_user_nps(nps):
+    user = get_user()
+    user.nps += nps
+    user.save()
     pass
 
 

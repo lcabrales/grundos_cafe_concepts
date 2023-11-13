@@ -3,6 +3,14 @@ from bilge_dice import bilgedice
 
 
 def home(request):
+    login_username = request.POST.get("username")
+    if login_username:
+        bilgedice.create_user_session(login_username)
+        return render_home(request)
+    
+    if not bilgedice.get_user_session():
+        return render_login(request)
+
     bet = request.POST.get("bet")
     is_start_over = check_start_over(request)
     is_show_results = check_show_results(request)
@@ -10,7 +18,7 @@ def home(request):
     if is_start_over:
         # start over after results view
         bilgedice.delete_current_game()
-        return render_welcome(request)
+        return render_home(request)
 
     if bet:
         # selected a bet from welcome view
@@ -19,7 +27,7 @@ def home(request):
 
     if not bilgedice.get_current_game():
         # error?
-        return render_welcome(request)
+        return render_home(request)
     
     if is_show_results:
         return render_results(request)
@@ -27,12 +35,16 @@ def home(request):
     return render_game(request)
 
 
-def render_welcome(request):
+def render_login(request):
+    return render(request, "bilge_dice/login.html", {})
+
+
+def render_home(request):
     user = bilgedice.get_user()
     context = {
         "user": user,
     }
-    return render(request, "bilge_dice/welcome.html", context)
+    return render(request, "bilge_dice/home.html", context)
 
 def render_game(request):
     if request.method == "POST":

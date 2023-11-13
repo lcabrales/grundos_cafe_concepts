@@ -2,7 +2,12 @@ from django.db import models
 
 class User(models.Model):
     username = models.CharField(max_length=30)
-    nps = models.IntegerField()
+    nps = models.IntegerField(default=1000)
+
+
+class Session(models.Model):
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+
 
 class Game(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
