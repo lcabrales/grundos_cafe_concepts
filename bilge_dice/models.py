@@ -22,3 +22,7 @@ class PlayerState(models.Model):
     qualifiers = models.CharField(max_length=2, blank=True)
     is_game_over = models.BooleanField(default=False)
     rolls_left = models.IntegerField(default=6)
+
+class UserBilgeDice(models.Model):
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    win_streak = models.IntegerField(default=0)

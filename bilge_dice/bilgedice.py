@@ -1,12 +1,19 @@
 import random
-from bilge_dice.models import User, Game, Player, PlayerState
+from bilge_dice.models import User, Game, Player, PlayerState, UserBilgeDice
 from enum import Enum
 
 TOTAL_DICE_COUNT = 6
+
 HAND_SIZE = 4
 QUALIFIERS_SIZE = 2
+
 FIRST_QUALIFIER = 1
 SECOND_QUALIFIER = 4
+
+NPS_WIN_MULTIPLIER = 4
+
+RNG_AVATAR_SCORE = 24
+WIN_STREAK_AVATAR_COUNT = 10
 
 def get_user():
     return User.objects.first()
@@ -38,6 +45,12 @@ def get_bet_value(bet_string):
 
 def get_user_player_db():
     return Player.objects.get(is_user=True)
+
+
+def get_user_bilge_dice():
+    user = get_user_player_db()
+    user_bilge_dice, created = UserBilgeDice.objects.get_or_create(user_id=user.id)
+    return user_bilge_dice
 
 
 def get_opponents_db():
@@ -230,7 +243,8 @@ def update_player_state(player, numbers):
     player_state.save()
 
 
-def get_final_results():
+def get_final_results(is_final_result):
+    game = get_current_game()
     user_player = get_user_player_db()
     user_player_state = get_player_state(user_player)
     user_score = calculate_score(user_player_state)
@@ -249,7 +263,7 @@ def get_final_results():
             scores_to_beat.append(opponent_score)
 
         opponent_image = opponent.image
-        if opponent_score <= user_score:
+        if opponent_score <= user_score or not is_qualified:
             opponent_image = opponent.image_sad
 
         opponent_result = OpponentResult(opponent.name, opponent_score, is_qualified, opponent_image)
@@ -260,19 +274,56 @@ def get_final_results():
         opponent_highest_score = max(scores_to_beat)
     
     game_result = 0
+    nps_won = 0
     if not is_player_qualified(user_player):
         game_result = GameResult.DID_N0T_QUALIFY
+        updateWinStreak(False)
     elif user_score > opponent_highest_score:
         game_result = GameResult.WON
+        nps_won = game.bet * NPS_WIN_MULTIPLIER
     elif user_score == opponent_highest_score:
         game_result = GameResult.TIED
+        nps_won = game.bet
     else:
         game_result = GameResult.LOST
 
     print(f"final score: {user_score}")
     print(f"opponents_results: {opponents_results}")
 
-    return FinalResults(user_score, game_result, opponents_results)
+    results = FinalResults(user_score, game_result, nps_won, opponents_results)
+
+    if is_final_result:
+        updateWinStreak(game_result == GameResult.WON)
+        if nps_won > 0:
+            credit_user_nps(nps_won)
+        checkAvatarsConditions(results)
+
+    return results
+
+
+def checkAvatarsConditions(results):
+    user = get_user_player_db()
+
+    # RNG score avatar
+    if results.user_score == RNG_AVATAR_SCORE:
+        check_rng_avatar()
+
+    user_bilge_dice = get_user_bilge_dice()
+    if user_bilge_dice.win_streak >= WIN_STREAK_AVATAR_COUNT:
+        grant_lucky_streak_avatar()
+
+
+def updateWinStreak(is_win):
+    user_bilge_dice = get_user_bilge_dice()
+
+    if is_win:
+        user_bilge_dice.win_streak += 1
+    else:
+        user_bilge_dice.win_streak = 0
+
+    print(f"user_bilge_dice.win_streak: {user_bilge_dice.win_streak}")
+
+    user_bilge_dice.save()
 
 
 def is_player_game_over(player):
@@ -347,6 +398,25 @@ def get_empty_dice_roll_image():
     return "/static/bilge_dice/images/d0.gif"
 
 
+def credit_user_nps(nps):
+    pass
+
+
+def check_rng_avatar():
+    if random.randint(0, 1) >= 1:
+        grant_rng_avatar()
+
+
+def grant_rng_avatar():
+    print("grant_rng_avatar")
+    pass
+
+
+def grant_lucky_streak_avatar():
+    print("grant_lucky_streak_avatar")
+    pass
+
+
 class DiceRoll:
   def __init__(self, number, image_url):
     self.number = number
@@ -370,9 +440,10 @@ class OpponentResult:
 
 
 class FinalResults:
-  def __init__(self, user_score, game_result, opponents_results):
+  def __init__(self, user_score, game_result, nps_won, opponents_results):
     self.user_score = user_score
     self.game_result = game_result
+    self.nps_won = nps_won
     self.opponents_results = opponents_results
 
 

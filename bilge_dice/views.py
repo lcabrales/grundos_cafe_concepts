@@ -64,7 +64,7 @@ def render_game(request):
 def render_final_user_score(request):
     user = bilgedice.get_user()
     user_player = bilgedice.get_user_player()
-    results = bilgedice.get_final_results()
+    results = bilgedice.get_final_results(False)
 
     context = {
         "user": user,
@@ -78,7 +78,9 @@ def render_final_user_score(request):
 def render_results(request):
     user = bilgedice.get_user()
     user_player = bilgedice.get_user_player()
-    results = bilgedice.get_final_results()
+    results = bilgedice.get_final_results(True)
+
+    bilgedice.delete_current_game()
 
     context = {
         "user": user,

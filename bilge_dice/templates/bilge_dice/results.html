@@ -38,10 +38,10 @@
                     {% if results.game_result.value == 1 %}
                         <p class="text-standard fw-bold">You won!</p>
                         <p class="text-standard fw-bold">Your score of {{ results.user_score }} was enough to win!</p>
-                        <p class="text-standard fw-bold">You won x NPs!</p>
+                        <p class="text-standard fw-bold">You won {{ results.nps_won }} NPs!</p>
                     {% elif results.game_result.value == 0 %}
                         <p class="text-standard fw-bold">You tied.</p>
-                        <p class="text-standard fw-bold">You won x NPs!</p>
+                        <p class="text-standard fw-bold">You won {{ results.nps_won }} NPs!</p>
                     {% else %}
                         <p class="text-standard fw-bold">Oh no!</p>
                         <p class="text-standard fw-bold">Your score of {{ results.user_score }} was not enough to win!</p>
