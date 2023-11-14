@@ -1,4 +1,7 @@
 import random
+import os
+from pathlib import Path
+from django.core.files import File
 from bilge_dice.models import User, Session, Game, Player, PlayerState, UserBilgeDice
 from enum import Enum
 
@@ -26,6 +29,8 @@ def create_user_session(username):
     user, created = User.objects.get_or_create(username=username)
     session = Session(user_id=user.id)
     session.save()
+
+    check_create_players()
 
 
 def get_user():
@@ -419,6 +424,46 @@ def get_empty_qualifier_image(number):
 
 def get_empty_dice_roll_image():
     return "/static/bilge_dice/images/d0.gif"
+
+
+def check_create_players():
+    if len(Player.objects.all()) == 4:
+        return
+    else:
+        Player.objects.all().delete()
+
+    player = Player(name="User", is_user=True)
+    player.save()
+
+    player = Player(name="Monty", is_user=False)
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_0.gif"))
+    with path.open(mode="rb") as f:
+        player.image = File(f, name=path.name)
+        player.save()
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_sad_0.gif"))
+    with path.open(mode="rb") as f:
+        player.image_sad = File(f, name=path.name)
+        player.save()
+
+    player = Player(name="Grimtooth", is_user=False)
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_1.gif"))
+    with path.open(mode="rb") as f:
+        player.image = File(f, name=path.name)
+        player.save()
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_sad_1.gif"))
+    with path.open(mode="rb") as f:
+        player.image_sad = File(f, name=path.name)
+        player.save()
+
+    player = Player(name="Deadeye", is_user=False)
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_2.gif"))
+    with path.open(mode="rb") as f:
+        player.image = File(f, name=path.name)
+        player.save()
+    path = Path(os.path.join(os.path.dirname(os.path.dirname(__file__)),"bilge_dice/static/bilge_dice/images/head_sad_2.gif"))
+    with path.open(mode="rb") as f:
+        player.image_sad = File(f, name=path.name)
+        player.save()
 
 
 def update_user_nps(nps):
